@@ -175,7 +175,7 @@ resource "aws_eip_association" "public_eip_ec2" {
 }
 
 resource "aws_route53_zone" "domain_orderize" {
-	name = "orderize.oficial.com"
+	name = "orderize.com"
 
 	tags = {
 		Name = "domain_orderize"
