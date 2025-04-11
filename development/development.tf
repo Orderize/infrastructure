@@ -1,3 +1,8 @@
+provider "aws" {
+	region 	= "us-east-1"
+	profile = "default"
+}
+
 resource "aws_vpc" "vpc_development" {
     cidr_block           = "10.0.0.0/30"
     enable_dns_support   = true
