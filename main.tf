@@ -1,3 +1,8 @@
+provider "aws" {
+	region 	= "us-east-1"
+	profile = "default"
+}
+
 resource "aws_vpc" "vpc_orderize" {
 	cidr_block 				= "10.0.0.0/24"
 	enable_dns_support 		= true
@@ -151,37 +156,21 @@ resource "aws_instance" "public_ec2" {
 }
 
 resource "aws_instance" "private_ec2" {
-	ami 					= "ami-04b4f1a9cf54c11d0"
-	instance_type 			= "t2.medium"
-	subnet_id 				= aws_subnet.private_subnet.id
-	vpc_security_group_ids 	= [aws_security_group.firewall.id]
-	key_name 				= "private keys"
+	count                     = 3
+	ami                       = "ami-04b4f1a9cf54c11d0"
+	instance_type             = "t2.medium"
+	subnet_id                 = aws_subnet.private_subnet.id
+	vpc_security_group_ids    = [aws_security_group.firewall.id]
+	key_name                  = "private keys"
 
 	tags = {
-		Name = "private_ec2"
+		Name = "private_ec2_${count.index + 1}"
 	}
 }
+
 
 resource "aws_eip_association" "public_eip_ec2" {
 	instance_id 	= aws_instance.public_ec2.id
-	allocation_id 	= aws_eip.public_eip.id
-
-	
-}
-
-resource "aws_route53_zone" "domain_orderize" {
-	name = "orderize.com"
-
-	tags = {
-		Name = "domain_orderize"
-	}
-}
-
-resource "aws_route53_record" "ec2_dns" {
-	zone_id = aws_route53_zone.domain_orderize.zone_id
-	name 	= "orderize.com"
-	type 	= "A"
-	ttl 	= 300
-	records = [aws_eip.public_eip.public_ip]
+	allocation_id 	= aws_eip.public_eip.id	
 }
 
