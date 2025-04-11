@@ -168,6 +168,22 @@ resource "aws_instance" "private_ec2" {
 	}
 }
 
+resource "aws_instance" "private_ec2_database" {
+	ami                       = "ami-04b4f1a9cf54c11d0"
+	instance_type             = "t2.medium"
+	subnet_id                 = aws_subnet.private_subnet.id
+	vpc_security_group_ids    = [aws_security_group.firewall.id]
+	key_name                  = "private keys"
+
+	lifecycle {
+		prevent_destroy = true
+	}
+
+	tags = {
+		Name = "private_ec2_database"
+	}
+}
+
 
 resource "aws_eip_association" "public_eip_ec2" {
 	instance_id 	= aws_instance.public_ec2.id
