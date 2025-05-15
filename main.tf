@@ -124,6 +124,21 @@ resource "aws_security_group" "firewall" {
 	}
 
 	ingress {
+		from_port 		= 80
+		to_port 		= 80
+		protocol 		= "tcp"
+		cidr_blocks 	= ["10.0.0.0/25"]
+	}
+
+
+	ingress {
+		from_port 		= 3306
+		to_port 		= 3306
+		protocol 		= "tcp"
+		cidr_blocks 	= ["10.0.0.0/25"]
+	}
+
+	ingress {
 		from_port 		= 22
 		to_port 		= 22
 		protocol 		= "tcp"
@@ -156,7 +171,6 @@ resource "aws_instance" "public_ec2" {
 }
 
 resource "aws_instance" "private_ec2" {
-	count                     = 3
 	ami                       = "ami-04b4f1a9cf54c11d0"
 	instance_type             = "t2.medium"
 	subnet_id                 = aws_subnet.private_subnet.id
@@ -164,26 +178,9 @@ resource "aws_instance" "private_ec2" {
 	key_name                  = "private keys"
 
 	tags = {
-		Name = "private_ec2_${count.index + 1}"
+		Name = "private_ec2"
 	}
 }
-
-resource "aws_instance" "private_ec2_database" {
-	ami                       = "ami-04b4f1a9cf54c11d0"
-	instance_type             = "t2.medium"
-	subnet_id                 = aws_subnet.private_subnet.id
-	vpc_security_group_ids    = [aws_security_group.firewall.id]
-	key_name                  = "private keys"
-
-	lifecycle {
-		prevent_destroy = true
-	}
-
-	tags = {
-		Name = "private_ec2_database"
-	}
-}
-
 
 resource "aws_eip_association" "public_eip_ec2" {
 	instance_id 	= aws_instance.public_ec2.id
